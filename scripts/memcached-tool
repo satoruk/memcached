@@ -106,6 +106,7 @@ if ($mode eq 'dump') {
             }
         }
 
+        my $now = time();
         foreach my $k (keys(%keyexp)) {
             print $sock "get $k\r\n";
             my $response = <$sock>;
@@ -113,8 +114,9 @@ if ($mode eq 'dump') {
                 my $flags = $2;
                 my $len = $3;
                 my $val;
+                my $exptime = ($keyexp{$k} < $now) ? 0 : $keyexp{$k};
                 read $sock, $val, $len;
-                print "add $k $flags $keyexp{$k} $len\r\n$val\r\n";
+                print "add $k $flags $exptime $len\r\n$val\r\n";
                 # get the END
                 $_ = <$sock>;
                 $_ = <$sock>;
